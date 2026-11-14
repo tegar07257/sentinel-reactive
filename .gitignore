@@ -1,0 +1,17 @@
+# Foundry build artifacts
+out/
+cache/
+broadcast/
+
+# Python
+__pycache__/
+*.pyc
+
+# Secrets — never commit keys or env files
+.env
+*.key
+*key*.json
+*.pem
+
+# AI layer runtime state (sample output is committed instead)
+ai-layer/state.json
