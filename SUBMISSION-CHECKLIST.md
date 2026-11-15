@@ -90,7 +90,7 @@ code, demo, docs).
         - Callback (Base Sepolia): `0xc68073a51b6d3a04db35699a85addc3d1177f465c04c9e48926fbb54d8270daa`
         - Deploy callback: `0xfd50ead776cb334992491d8be7398542a938ff10cd21f35a8f2c3c9fc793e4db`
         - Deploy Sentinel: `0x6dfbcbe1e8735a421d45b027c53efab7888c980130e0627263f87cd39c17dedd`
-      - Demo video link (< 3 min): **https://www.youtube.com/watch?v=l8x22ZWlwxo**
+      - Demo video link (< 3 min): **https://www.youtube.com/watch?v=KHZIi5kzcUU**
         (public demo video already published — recorded here 15 Nov 2026)
       - Description: adapt the repo README (what it is, the loop, the
         debt lesson, the AI layer, F-AI-1, honest limitations). Use
