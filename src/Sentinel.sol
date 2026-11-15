@@ -5,11 +5,16 @@ import { ISystemContract } from "@reactive/src/interfaces/ISystemContract.sol";
 import { IReactive } from "@reactive/src/interfaces/IReactive.sol";
 import { AbstractReactive } from "@reactive/src/base/AbstractReactive.sol";
 
-/// @title Sentinel — Reactive Meets AI (Minggu 1 scaffold)
+/// @title Sentinel — Reactive Meets AI (hardened redeploy, 2026-11-15)
 /// @notice Reactive contract on Lasna testnet. Subscribes to ERC-20 Transfer
-/// events of one token on Base Sepolia and to Cron100 ticks. A transfer at or
+/// events of one token on Base Sepolia and to Cron1000 ticks. A transfer at or
 /// above `threshold` counts as a "large sell": state is updated and an `alert`
 /// callback is requested to the counterparty contract on Base Sepolia.
+/// Hardening vs the first deployment (see ../TRIGGER-FIX-2026-11-14.md):
+/// threshold raised to 0.05 ETH (far fewer organic triggers), Cron1000
+/// instead of Cron100 (ticks billed 10x less often), callback gas limit
+/// 200_000 (set in the deploy script), and `coverDebt()` exposed so the
+/// contract's own balance can settle system-contract debt.
 /// The AI classification step (local qwen2.5:1.5b, proven in the Cortensor
 /// agent-loop demo) plugs in during Minggu 2: the off-chain agent reads
 /// `largeSellCount` / `lastLargeSellAmount` and decides the callback payload.
@@ -19,9 +24,9 @@ contract Sentinel is AbstractReactive {
     /// @notice keccak256("Transfer(address,address,uint256)")
     uint256 internal constant TRANSFER_TOPIC_0 =
         0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
-    /// @notice Cron100 topic0 from Reactive docs (every ~100 blocks, ~2 min).
-    uint256 internal constant CRON100_TOPIC_0 =
-        0xb49937fb8970e19fd46d48f7e3fb00d659deac0347f79cd7cb542f0fc1503c70;
+    /// @notice Cron1000 topic0 from Reactive docs (every ~1000 blocks, ~17 min).
+    uint256 internal constant CRON1000_TOPIC_0 =
+        0xe20b31294d84c3661ddc8f423abb9c70310d0cf172aa2714ead78029b325e3f4;
     /// @notice Legacy system contract address, emitter of Cron events.
     address internal constant LEGACY_SYSTEM_ADDR =
         0x0000000000000000000000000000000000fffFfF;
@@ -67,7 +72,7 @@ contract Sentinel is AbstractReactive {
         SYSTEM.subscribe(
             block.chainid,
             LEGACY_SYSTEM_ADDR,
-            CRON100_TOPIC_0,
+            CRON1000_TOPIC_0,
             REACTIVE_IGNORE,
             REACTIVE_IGNORE,
             REACTIVE_IGNORE
@@ -89,7 +94,7 @@ contract Sentinel is AbstractReactive {
     function react(LogRecord memory log_) external onlySystem {
         if (log_.topic0 == TRANSFER_TOPIC_0) {
             _onTransfer(log_);
-        } else if (log_.topic0 == CRON100_TOPIC_0) {
+        } else if (log_.topic0 == CRON1000_TOPIC_0) {
             lastCronBlock = block.number;
             emit CronTick(block.number);
         }

@@ -46,6 +46,8 @@ Without it the service still completes, with `rules-fallback` records.
 Env knobs: `SENTINEL_AI_MODEL`, `SENTINEL_AI_OLLAMA_BASE`,
 `SENTINEL_AI_LASNA_FROM`, `SENTINEL_AI_BASE_FROM` (log scan starts).
 
-Contracts read (both `0xb78d73DEfCcCD42f3A6bbca4E05aF9149320c3C9`):
-Sentinel on Lasna (`https://lasna-rpc.rnk.dev`), SentinelCallback on
-Base Sepolia (`https://sepolia.base.org` + public fallbacks).
+Contracts read: Sentinel `0xE86A5E5D1bCC4c1bF68aecAA8D3763BF475e8AE0`
+on Lasna (`https://lasna-rpc.rnk.dev`), SentinelCallback
+`0x61D4b1F2bC65d578B00CC9CF64a83EA191Cd6245` on Base Sepolia
+(`https://sepolia.base.org` + public fallbacks). Pair #3, hardened
+redeploy of 15 Nov 2026 (see `../REDEPLOY-2026-11-15.md`).

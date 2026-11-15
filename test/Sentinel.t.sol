@@ -13,8 +13,8 @@ contract SentinelTest is Test {
         0x8888888888888888888888888888888888888888;
     uint256 internal constant TRANSFER_TOPIC_0 =
         0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
-    uint256 internal constant CRON100_TOPIC_0 =
-        0xb49937fb8970e19fd46d48f7e3fb00d659deac0347f79cd7cb542f0fc1503c70;
+    uint256 internal constant CRON1000_TOPIC_0 =
+        0xe20b31294d84c3661ddc8f423abb9c70310d0cf172aa2714ead78029b325e3f4;
 
     uint256 internal constant BASE_SEPOLIA = 84532;
     address internal constant TOKEN = 0x1111111111111111111111111111111111111111;
@@ -39,7 +39,7 @@ contract SentinelTest is Test {
             1000 ether,
             BASE_SEPOLIA,
             address(callbackContract),
-            1_000_000
+            500_000
         );
     }
 
@@ -75,7 +75,7 @@ contract SentinelTest is Test {
                     ISystemContract.CallbackConfiguration_V_1_0({
                         chainId: BASE_SEPOLIA,
                         recipient: address(callbackContract),
-                        gasLimit: 1_000_000,
+                        gasLimit: 500_000,
                         payload: abi.encodeWithSignature(
                             "alert(address,uint256,uint256)",
                             address(sentinel),
@@ -103,7 +103,7 @@ contract SentinelTest is Test {
 
     function test_cron_tick_recorded() public {
         IReactive.LogRecord memory log_ = _transferLog(0);
-        log_.topic0 = CRON100_TOPIC_0;
+        log_.topic0 = CRON1000_TOPIC_0;
         log_.opCode = 1;
         vm.roll(777);
         vm.prank(SYSTEM_ADDR);

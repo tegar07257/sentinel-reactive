@@ -35,7 +35,7 @@ contract DeploySentinel is Script {
             threshold,
             originChainId,
             callbackRecipient,
-            1_000_000
+            500_000
         );
         vm.stopBroadcast();
     }

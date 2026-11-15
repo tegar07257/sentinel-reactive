@@ -21,7 +21,7 @@ Everything here is testnet. No mainnet, no real funds.
 Base Sepolia                     Lasna (Reactive)                  Base Sepolia
 ─────────────                    ────────────────                  ────────────
 WETH Transfer ──event──▶ Sentinel.react() ──requestCallback──▶ SentinelCallback.alert()
-(amount ≥ 0.001 ETH)     counts it, emits                         records count,
+(amount ≥ 0.05 ETH)      counts it, emits                         records count,
                          LargeSell(count,                         amount, block;
                          amount, block)                           emits Alert(...)
                                   │
@@ -34,9 +34,9 @@ WETH Transfer ──event──▶ Sentinel.react() ──requestCallback──�
 
 1. `Sentinel` (Lasna, chain 5318007) subscribes in its constructor to
    ERC-20 `Transfer` events of WETH (`0x4200000000000000000000000000000000000006`)
-   on Base Sepolia (chain 84532), and to Cron100 ticks.
+   on Base Sepolia (chain 84532), and to Cron1000 ticks.
 2. In `react()` — callable only by the Reactive system contract — a
-   transfer `≥ threshold` (0.001 ETH) increments `largeSellCount`,
+   transfer `≥ threshold` (0.05 ETH) increments `largeSellCount`,
    stores the amount and origin block, emits `LargeSell`, and requests
    a callback.
 3. The callback lands on `SentinelCallback` (Base Sepolia), which only
@@ -47,28 +47,44 @@ WETH Transfer ──event──▶ Sentinel.react() ──requestCallback──�
    `LargeSell` with its `Alert`, classifies the detection, and writes
    an append-only JSONL assessment.
 
-Both contracts were deployed from the same wallet at nonce 0, so —
-conveniently — **both live at the same address**:
+The current deployment is **pair #3, the hardened redeploy of
+15 Nov 2026** (threshold 0.05 ETH, Cron1000, callback gas limit
+500,000; full record in `REDEPLOY-2026-11-15.md`). The two contracts
+now live at **different** addresses:
 
 | Contract | Chain | Address |
 |---|---|---|
-| Sentinel | Lasna (5318007) | `0xb78d73DEfCcCD42f3A6bbca4E05aF9149320c3C9` |
-| SentinelCallback | Base Sepolia (84532) | `0xb78d73DEfCcCD42f3A6bbca4E05aF9149320c3C9` |
+| Sentinel | Lasna (5318007) | `0xE86A5E5D1bCC4c1bF68aecAA8D3763BF475e8AE0` |
+| SentinelCallback | Base Sepolia (84532) | `0x61D4b1F2bC65d578B00CC9CF64a83EA191Cd6245` |
 
 Explorers:
-[Sentinel on Reactscan (Lasna)](https://lasna.reactscan.net/address/0xb78d73DEfCcCD42f3A6bbca4E05aF9149320c3C9) ·
-[SentinelCallback on Basescan (Base Sepolia)](https://sepolia.basescan.org/address/0xb78d73DEfCcCD42f3A6bbca4E05aF9149320c3C9)
+[Sentinel on Reactscan (Lasna)](https://lasna.reactscan.net/address/0xE86A5E5D1bCC4c1bF68aecAA8D3763BF475e8AE0) ·
+[SentinelCallback on Basescan (Base Sepolia)](https://sepolia.basescan.org/address/0x61D4b1F2bC65d578B00CC9CF64a83EA191Cd6245)
 
 Deploy transactions: callback
-[`0xfd50ead7…e4db`](https://sepolia.basescan.org/tx/0xfd50ead776cb334992491d8be7398542a938ff10cd21f35a8f2c3c9fc793e4db) (Base Sepolia),
-Sentinel `0x6dfbcbe1e8735a421d45b027c53efab7888c980130e0627263f87cd39c17dedd` (Lasna).
+[`0x1dc55d93…b490`](https://sepolia.basescan.org/tx/0x1dc55d939db77ffa3102b98481f34739d7abbcfaf18caf8ea4ac9bee3d25b490) (Base Sepolia),
+Sentinel `0xba6ad5c8f859aeb2ba4f9a2fdaf1e3e715031c589a49f4e75650b377599cdf51` (Lasna).
 
-**Verified live (14 Nov 2026):** 20 detections, 20 callbacks at counter
-level. The first organic detection was a WETH transfer of
-**0.070873991024375358 ETH** (70.87× the threshold) at Base Sepolia
-block 58518904; its callback arrived 6 blocks later.
-Detection tx (Lasna): `0xe9310189575b458113f3c7acd4118d590b09215640b4fd61d8f5dfa434158a8d`;
-callback tx (Base Sepolia): `0xc68073a51b6d3a04db35699a85addc3d1177f465c04c9e48926fbb54d8270daa`.
+**Verified live (15 Nov 2026):** within minutes of deployment the
+hardened pair processed organic WETH transfers end-to-end —
+detections and callbacks matched 1:1 at event level (6 `LargeSell` /
+6 `Alert` in the first verification window, more after a revival
+top-up). The first organic detection was a WETH transfer of
+**0.274850660950339408 ETH** (≈5.5× the 0.05 threshold) at Base
+Sepolia block 58969593; its callback arrived 9 blocks later.
+Detection tx (Lasna): `0xebd1f7b5820a6d96d995399d7deba66c8b7570ae62de98ec27d4edada596c4bc`;
+callback tx (Base Sepolia): `0x545d6c0906340e608bd01602b24dd87daa63b95a2cf860857e290a04d506deeb`.
+
+The first deployment (pair #1, 14 Nov 2026, threshold 0.001 ETH,
+Cron100, gas limit 1,000,000) was deployed from the same wallet at
+nonce 0, so both contracts shared one address,
+`0xb78d73DEfCcCD42f3A6bbca4E05aF9149320c3C9`. It reached 20
+detections / 20 callbacks at counter level; its first organic
+detection was **0.070873991024375358 ETH** (70.87× its threshold) at
+Base Sepolia block 58518904 (detection tx
+`0xe9310189575b458113f3c7acd4118d590b09215640b4fd61d8f5dfa434158a8d`,
+callback tx `0xc68073a51b6d3a04db35699a85addc3d1177f465c04c9e48926fbb54d8270daa`).
+Pair #1 is superseded by pair #3.
 
 ## The hard lesson: Reactive debt silently pauses everything
 
@@ -189,15 +205,26 @@ For model-narrated records, start Ollama first (`ollama serve`, model
 
 ## Honest limitations
 
-- **Demo economics are wasteful by design.** A 0.001 ETH threshold on
-  Base Sepolia's WETH — a busy testnet token — means organic transfers
-  above threshold arrive constantly. While the contract is in debt
-  they queue; once revived, the burst drains reserves within blocks
-  and the contract pauses again. This is correct network behaviour,
-  not a bug — but it means the demo must be funded right before it
-  runs (see the `depositTo` rule above). A hardened redeploy
-  (threshold ~0.05 ETH, Cron1000 instead of Cron100, callback gas
-  ~200k) is the planned fix if longer unattended operation is needed.
+- **Demo economics are wasteful by design.** Even at the hardened
+  0.05 ETH threshold, organic transfers above threshold on Base
+  Sepolia's WETH — a busy testnet token — arrive in bursts, and each
+  detection cycle cost a measured ~0.05–0.077 lREACT on Lasna during
+  the 15 Nov 2026 verification, so a 0.5 lREACT top-up buys only a
+  handful of cycles before reserves run out and the contract
+  debt-pauses again. While the contract is in debt, events queue;
+  once revived, the burst drains reserves within blocks. This is
+  correct network behaviour, not a bug — but it means the demo must
+  be funded right before it runs (see the `depositTo` rule above).
+  The hardened redeploy (threshold 0.05 ETH, Cron1000 instead of
+  Cron100, callback gas 500,000) reduced trigger frequency; it
+  cannot change the network's per-execution pricing.
+- **Callback gas limits are not forwarded whole.** The Base Sepolia
+  callback proxy withholds 130,000 gas (`_extraGas` 80,000 +
+  `_maxChargeGas` 50,000) before invoking the recipient. A first
+  hardened attempt with a 200,000 limit therefore forwarded only
+  70,000 — less than `alert()`'s ~92,000 — and all 6 deliveries
+  failed with `CallbackFailure` (pair #2, superseded). The live pair
+  uses 500,000, which forwards ~370,000.
 - **The AI layer assesses; it does not control.** Callbacks fire from
   the Reactive contract regardless of classification. An on-chain
   assessment registry (hash-anchoring each record) was designed but
@@ -206,9 +233,9 @@ For model-narrated records, start Ollama first (`ollama serve`, model
   narration are spelled out for the model to copy verbatim; it still
   occasionally rambles. Labels never depend on it.
 - `lastCronBlock` remains 0 on the live contract for the economic
-  reason explained above (funded windows shorter than the 100-block
-  tick interval), not a subscription defect — proven by the isolated
-  Cron probe.
+  reason explained above (funded windows shorter than the tick
+  interval — 100 blocks on pair #1, 1000 on pair #3), not a
+  subscription defect — proven by the isolated Cron probe.
 
 ## Credits
 

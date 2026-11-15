@@ -41,7 +41,7 @@ from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from chain import BASE_SEPOLIA, LASNA, SENTINEL  # noqa: E402
+from chain import BASE_SEPOLIA, CALLBACK, LASNA, SENTINEL  # noqa: E402
 from classifier import classify, features  # noqa: E402
 from keccak import topic0  # noqa: E402
 from narrate import MODEL, narrate  # noqa: E402
@@ -87,11 +87,11 @@ def read_counters():
             SENTINEL, "lastLargeSellBlock()"),
         "lastCronBlock": LASNA.eth_call_uint(SENTINEL, "lastCronBlock()"),
         "lastAlertCount": BASE_SEPOLIA.eth_call_uint(
-            SENTINEL, "lastAlertCount()"),
+            CALLBACK, "lastAlertCount()"),
         "lastAlertAmount": BASE_SEPOLIA.eth_call_uint(
-            SENTINEL, "lastAlertAmount()"),
+            CALLBACK, "lastAlertAmount()"),
         "lastAlertBlock": BASE_SEPOLIA.eth_call_uint(
-            SENTINEL, "lastAlertBlock()"),
+            CALLBACK, "lastAlertBlock()"),
         "lasna_head": LASNA.block_number(),
         "base_head": BASE_SEPOLIA.block_number(),
     }
@@ -189,7 +189,7 @@ def run_once(use_model=True):
         print(f"[warn] LargeSell history fetch failed: {e}",
               file=sys.stderr)
     try:
-        raw = BASE_SEPOLIA.get_logs(SENTINEL, ALERT_TOPIC, BASE_FROM,
+        raw = BASE_SEPOLIA.get_logs(CALLBACK, ALERT_TOPIC, BASE_FROM,
                                     counters["base_head"],
                                     initial_chunk=10_000)
         alerts = {a["count"]: a for a in (parse_alert(l) for l in raw)}

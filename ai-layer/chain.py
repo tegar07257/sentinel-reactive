@@ -125,6 +125,9 @@ BASE_SEPOLIA = Chain(
     log_endpoints=["https://base-sepolia-rpc.publicnode.com",
                    "https://sepolia.base.org"])
 
-SENTINEL = "0xb78d73DEfCcCD42f3A6bbca4E05aF9149320c3C9"
-# Same address on both chains (CREATE with the same nonce from the same
-# deployer): Sentinel lives on Lasna, SentinelCallback on Base Sepolia.
+SENTINEL = "0xE86A5E5D1bCC4c1bF68aecAA8D3763BF475e8AE0"
+CALLBACK = "0x61D4b1F2bC65d578B00CC9CF64a83EA191Cd6245"
+# Pair #3 (hardened redeploy, 15 Nov 2026): Sentinel lives on Lasna,
+# SentinelCallback on Base Sepolia — different addresses per chain.
+# (Pair #1, superseded, shared 0xb78d73DEfCcCD42f3A6bbca4E05aF9149320c3C9
+# on both chains.)
